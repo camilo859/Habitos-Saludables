@@ -11,7 +11,6 @@ export default function HomeScreen({ navigation }) {
     [navigation]
   );
 
-  // useMemo: fecha actual formateada, no se recalcula en cada render
   const today = useMemo(() => {
     return new Date().toLocaleDateString("es-ES", {
       weekday: "long",
@@ -20,7 +19,6 @@ export default function HomeScreen({ navigation }) {
     });
   }, []);
 
-  // useMemo: no recalcula en cada render, solo cuando cambia habits
   const completedCount = useMemo(
     () => habits.filter((h) => h.completed).length,
     [habits]
@@ -44,7 +42,6 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.header}>Hola, Juan 👋</Text>
       <Text style={styles.subheader}>{today}</Text>
 
-      {/* Pills de stats */}
       <View style={styles.statsRow}>
         <View style={styles.progressPill}>
           <Text style={styles.progressText}>
@@ -84,7 +81,6 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
 
-  // ── Header ──────────────────────────────────────────────────
   headerContainer: {
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -112,7 +108,6 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
   },
 
-  // ── Pills ────────────────────────────────────────────────────
   statsRow: {
     flexDirection: "row",
     gap: 8,
