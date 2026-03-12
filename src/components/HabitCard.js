@@ -1,144 +1,180 @@
-import React, { useCallback } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
+import { evaluateHabit, getLevelColor, getLevelLabel } from "../utils/habitRules";
 
+/**
+ * HabitCard — tarjeta de un hábito en la lista principal.
+ * Usa React.memo para evitar re-renders innecesarios.
+ */
 const HabitCard = React.memo(({ habit, onPress }) => {
-  const handlePress = useCallback(() => {
-    onPress(habit);
-  }, [onPress, habit]);
+  const { width } = useWindowDimensions();
+  const isTablet = width > 600;
 
-  const isCompleted = habit.completed === true;
+  const evaluation = React.useMemo(
+    () => evaluateHabit(habit.streak, habit.failures),
+    [habit.streak, habit.failures]
+  );
+  const levelColor = getLevelColor(evaluation.level);
+  const levelLabel = getLevelLabel(evaluation.level);
 
   return (
     <TouchableOpacity
-      style={[styles.card, isCompleted && styles.cardCompleted]}
-      onPress={handlePress}
-      activeOpacity={0.8}
+      style={[styles.card, { marginHorizontal: isTablet ? 40 : 16 }]}
+      onPress={() => onPress(habit)}
+      activeOpacity={0.82}
     >
-      <View style={[styles.accentBar, isCompleted && styles.accentBarCompleted]} />
+      {/* Barra de color izquierda */}
+      <View style={[styles.accentBar, { backgroundColor: habit.color }]} />
 
       <View style={styles.content}>
-        <View style={styles.titleRow}>
-          <Text style={[styles.title, isCompleted && styles.titleCompleted]}>
-            {habit.name}
-          </Text>
-          {isCompleted && (
-            <View style={styles.checkBadge}>
-              <Text style={styles.checkText}>✓</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.footer}>
-          <View style={[styles.streakBadge, isCompleted && styles.streakBadgeCompleted]}>
-            <Text style={[styles.streakText, isCompleted && styles.streakTextCompleted]}>
-              🔥 {habit.streak} días
+        {/* Fila superior: icono + nombre + badge categoría */}
+        <View style={styles.topRow}>
+          <View style={[styles.iconWrap, { backgroundColor: habit.color + "18" }]}>
+            <Text style={[styles.icon, { fontSize: isTablet ? 28 : 24 }]}>
+              {habit.icon}
             </Text>
           </View>
-
-          {habit.category && (
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{habit.category}</Text>
+          <View style={styles.nameBlock}>
+            <Text
+              style={[styles.title, { fontSize: isTablet ? 18 : 16 }]}
+              numberOfLines={1}
+            >
+              {habit.name}
+            </Text>
+            <View style={styles.badgeRow}>
+              <View style={[styles.badge, { backgroundColor: habit.color + "22" }]}>
+                <Text style={[styles.badgeText, { color: habit.color }]}>
+                  {habit.category}
+                </Text>
+              </View>
+              <View style={[styles.badge, { backgroundColor: levelColor + "18" }]}>
+                <Text style={[styles.badgeText, { color: levelColor }]}>
+                  {levelLabel}
+                </Text>
+              </View>
             </View>
-          )}
+          </View>
+        </View>
+
+        {/* Fila de stats */}
+        <View style={styles.statsRow}>
+          <View style={styles.stat}>
+            <Text style={styles.statVal}>🔥 {habit.streak}</Text>
+            <Text style={styles.statLbl}>días racha</Text>
+          </View>
+          <View style={styles.sep} />
+          <View style={styles.stat}>
+            <Text style={styles.statVal}>❌ {habit.failures}</Text>
+            <Text style={styles.statLbl}>fallas</Text>
+          </View>
+          <View style={styles.sep} />
+          <View style={styles.stat}>
+            <Text style={styles.statVal}>🎯 {habit.goal}</Text>
+            <Text style={styles.statLbl}>{habit.unit}</Text>
+          </View>
         </View>
       </View>
+
+      <Text style={styles.arrow}>›</Text>
     </TouchableOpacity>
   );
 });
 
-HabitCard.displayName = "HabitCard";
-
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "row",
     backgroundColor: "#FFFFFF",
-    marginVertical: 6,
-    marginHorizontal: 20,
-    borderRadius: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.07,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 3,
+    borderRadius: 18,
+    marginVertical: 7,
+    flexDirection: "row",
+    alignItems: "center",
     overflow: "hidden",
-  },
-  cardCompleted: {
-    backgroundColor: "#F0FDF4",
-    shadowOpacity: 0.04,
+    elevation: 3,
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
   accentBar: {
-    width: 4,
-    backgroundColor: "#3B82F6",
-  },
-  accentBarCompleted: {
-    backgroundColor: "#22C55E",
+    width: 5,
+    alignSelf: "stretch",
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: 14,
   },
-  titleRow: {
+  topRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: 10,
   },
-  title: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#1E293B",
+  iconWrap: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  icon: {
+    lineHeight: 46,
+  },
+  nameBlock: {
     flex: 1,
   },
-  titleCompleted: {
-    color: "#86EFAC",
-    textDecorationLine: "line-through",
+  title: {
+    fontWeight: "700",
+    color: "#1E293B",
+    marginBottom: 5,
   },
-  checkBadge: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#22C55E",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 8,
+  badgeRow: {
+    flexDirection: "row",
+    gap: 6,
   },
-  checkText: {
-    fontSize: 13,
-    fontWeight: "800",
-    color: "#FFFFFF",
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 20,
   },
-  footer: {
+  badgeText: {
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  statsRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    padding: 10,
   },
-  streakBadge: {
-    backgroundColor: "#DBEAFE",
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  stat: {
+    flex: 1,
+    alignItems: "center",
   },
-  streakBadgeCompleted: {
-    backgroundColor: "#DCFCE7",
-  },
-  streakText: {
-    fontSize: 12,
+  statVal: {
+    fontSize: 13,
     fontWeight: "700",
-    color: "#1D4ED8",
+    color: "#1E293B",
   },
-  streakTextCompleted: {
-    color: "#16A34A",
+  statLbl: {
+    fontSize: 10,
+    color: "#94A3B8",
+    marginTop: 2,
   },
-  categoryBadge: {
-    backgroundColor: "#F1F5F9",
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  sep: {
+    width: 1,
+    height: 26,
+    backgroundColor: "#E2E8F0",
   },
-  categoryText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#64748B",
+  arrow: {
+    fontSize: 26,
+    color: "#CBD5E1",
+    paddingRight: 12,
   },
 });
 
