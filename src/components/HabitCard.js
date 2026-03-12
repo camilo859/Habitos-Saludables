@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const HabitCard = React.memo(({ habit, onPress }) => {
-  // useCallback: evita crear una nueva función en cada render
   const handlePress = useCallback(() => {
     onPress(habit);
   }, [onPress, habit]);
@@ -15,11 +14,9 @@ const HabitCard = React.memo(({ habit, onPress }) => {
       onPress={handlePress}
       activeOpacity={0.8}
     >
-      {/* Barra de acento: verde si completado, azul si pendiente */}
       <View style={[styles.accentBar, isCompleted && styles.accentBarCompleted]} />
 
       <View style={styles.content}>
-        {/* Fila superior: nombre + check si está completado */}
         <View style={styles.titleRow}>
           <Text style={[styles.title, isCompleted && styles.titleCompleted]}>
             {habit.name}
@@ -31,7 +28,6 @@ const HabitCard = React.memo(({ habit, onPress }) => {
           )}
         </View>
 
-        {/* Footer: racha + categoría si existe */}
         <View style={styles.footer}>
           <View style={[styles.streakBadge, isCompleted && styles.streakBadgeCompleted]}>
             <Text style={[styles.streakText, isCompleted && styles.streakTextCompleted]}>
@@ -66,7 +62,6 @@ const styles = StyleSheet.create({
     elevation: 3,
     overflow: "hidden",
   },
-  // Card completada: fondo verde muy suave
   cardCompleted: {
     backgroundColor: "#F0FDF4",
     shadowOpacity: 0.04,
@@ -75,7 +70,6 @@ const styles = StyleSheet.create({
     width: 4,
     backgroundColor: "#3B82F6",
   },
-  // Barra verde cuando está completado
   accentBarCompleted: {
     backgroundColor: "#22C55E",
   },
@@ -95,12 +89,10 @@ const styles = StyleSheet.create({
     color: "#1E293B",
     flex: 1,
   },
-  // Título atenuado si está completado
   titleCompleted: {
     color: "#86EFAC",
     textDecorationLine: "line-through",
   },
-  // Círculo verde con ✓
   checkBadge: {
     width: 24,
     height: 24,
@@ -126,7 +118,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  // Badge de racha verde cuando completado
   streakBadgeCompleted: {
     backgroundColor: "#DCFCE7",
   },
