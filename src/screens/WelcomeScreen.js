@@ -1,3 +1,4 @@
+// src/screens/WelcomeScreen.js
 import React, { useState, useCallback } from "react";
 import {
   View,
@@ -25,7 +26,7 @@ export default function WelcomeScreen({ navigation }) {
       return;
     }
     setError("");
-    navigation.replace("Home", { userName: trimmed });
+    navigation.replace("Login", { userName: trimmed });
   }, [name, navigation]);
  
   return (
