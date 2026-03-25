@@ -1,13 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-/**
- * AppLogo — logo de la app Hábitos Saludables.
- * Usa solo React Native primitivos (sin dependencias extra).
- * Props:
- *   size  — "sm" | "md" | "lg"  (default "md")
- *   dark  — bool, fondo oscuro => texto claro (default false)
- */
+
 const SIZES = {
   sm: { icon: 28, badge: 36, title: 13, tagline: 9 },
   md: { icon: 38, badge: 48, title: 17, tagline: 11 },
