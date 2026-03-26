@@ -7,18 +7,21 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import HabitCard from "../components/HabitCard";
 import AppLogo from "../components/AppLogo";
 import NotificationBell from "../components/NotificationBell";
 import { habits, categories } from "../utils/dummyData";
+import { auth } from "../config/firebase";
 
 export default function HomeScreen({ route, navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
   const [selectedCategory, setSelectedCategory] = useState("Todas");
+  const [loading, setLoading] = useState(false);
 
-  // Nombre recibido desde WelcomeScreen
+  // Nombre recibido desde LoginScreen o RegisterScreen
   const userName = route.params?.userName ?? "Usuario";
 
   // Poner la campanita en el header
@@ -36,7 +39,7 @@ export default function HomeScreen({ route, navigation }) {
 
   const summary = useMemo(() => ({
     total: habits.length,
-    bestStreak: Math.max(...habits.map((h) => h.streak)),
+    bestStreak: habits.length > 0 ? Math.max(...habits.map((h) => h.streak)) : 0,
     perfect: habits.filter((h) => h.failures === 0).length,
   }), []);
 
@@ -131,6 +134,15 @@ export default function HomeScreen({ route, navigation }) {
     [isTablet, summary, renderCategory, selectedCategory, filteredHabits.length, userName]
   );
 
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={styles.loadingText}>Cargando tus hábitos...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -150,6 +162,8 @@ export default function HomeScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F1F5F9" },
+  centerContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#F1F5F9" },
+  loadingText: { marginTop: 12, color: "#64748B", fontSize: 14 },
   hero: {
     backgroundColor: "#2563EB",
     paddingTop: 16,

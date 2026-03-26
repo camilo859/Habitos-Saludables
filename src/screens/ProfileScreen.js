@@ -6,10 +6,13 @@ import {
   useWindowDimensions,
   ScrollView,
   FlatList,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { habits, userProfile } from "../utils/dummyData";
 import { getLevelColor, getLevelLabel } from "../utils/habitRules";
 import AppLogo from "../components/AppLogo";
+import { logoutUser } from "../services/authService";
 
 /** Fila de estadística individual — memoizada para FlatList */
 const StatRow = React.memo(({ label, value, color }) => (
@@ -19,7 +22,7 @@ const StatRow = React.memo(({ label, value, color }) => (
   </View>
 ));
 
-export default function ProfileScreen({ route }) {
+export default function ProfileScreen({ route, navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
 
@@ -61,6 +64,28 @@ export default function ProfileScreen({ route }) {
 
   const levelColor = getLevelColor(lastLevel);
   const levelLabel = getLevelLabel(lastLevel);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Cerrar sesión',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await logoutUser();
+            if (result.success) {
+              navigation.replace('Login');
+            } else {
+              Alert.alert('Error', result.error);
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <ScrollView
@@ -124,6 +149,13 @@ export default function ProfileScreen({ route }) {
       <View style={styles.totalCard}>
         <Text style={styles.totalNumber}>{habits.length}</Text>
         <Text style={styles.totalLabel}>hábitos activos registrados</Text>
+      </View>
+
+      {/* Botón de cerrar sesión */}
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>🚪 Cerrar sesión</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -221,4 +253,19 @@ const styles = StyleSheet.create({
   },
   totalNumber: { fontSize: 52, fontWeight: "900", color: "#FFFFFF" },
   totalLabel: { fontSize: 14, color: "#BFDBFE", marginTop: 4 },
+  logoutContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  logoutText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
 });
