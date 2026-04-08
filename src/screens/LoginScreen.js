@@ -1,4 +1,3 @@
-// src/screens/LoginScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -13,6 +12,7 @@ import {
   Alert
 } from 'react-native';
 import { loginUser, resetPassword } from '../services/authService';
+import { isIOS, isAndroid, platformColors, getShadowStyle } from '../utils/platformStyles';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -64,16 +64,23 @@ export default function LoginScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.logoContainer}>
           <Text style={styles.logoEmoji}>🌿</Text>
-          <Text style={styles.logoText}>HábitosApp</Text>
+          <Text style={[styles.logoText, isIOS && styles.iosLogoText]}>HábitosApp</Text>
         </View>
         
-        <Text style={styles.title}>Bienvenido de vuelta</Text>
+        <Text style={[styles.title, isIOS && styles.iosTitle]}>Bienvenido de vuelta</Text>
         <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
+
+        {/* Mostrar plataforma (requisito a) */}
+        <View style={styles.platformBadge}>
+          <Text style={styles.platformText}>
+            {isIOS ? '🍎 Ejecutándose en iOS' : '🤖 Ejecutándose en Android'}
+          </Text>
+        </View>
 
         {!showReset ? (
           <>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isIOS && styles.iosInput]}
               placeholder="Correo electrónico"
               placeholderTextColor="#94A3B8"
               value={email}
@@ -83,7 +90,7 @@ export default function LoginScreen({ navigation }) {
             />
             
             <TextInput
-              style={styles.input}
+              style={[styles.input, isIOS && styles.iosInput]}
               placeholder="Contraseña"
               placeholderTextColor="#94A3B8"
               value={password}
@@ -92,20 +99,29 @@ export default function LoginScreen({ navigation }) {
             />
 
             <TouchableOpacity
-              style={[styles.button, loading && styles.buttonDisabled]}
+              style={[
+                styles.button, 
+                loading && styles.buttonDisabled,
+                isAndroid && styles.androidButton,
+                getShadowStyle('light')
+              ]}
               onPress={handleLogin}
               disabled={loading}
+              activeOpacity={isIOS ? 0.7 : 0.85}
             >
               {loading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.buttonText}>Iniciar Sesión</Text>
+                <Text style={[styles.buttonText, isAndroid && styles.androidButtonText]}>
+                  {isAndroid ? 'INICIAR SESIÓN' : 'Iniciar Sesión'}
+                </Text>
               )}
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShowReset(true)}
               style={styles.linkButton}
+              activeOpacity={isIOS ? 0.7 : 0.85}
             >
               <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
             </TouchableOpacity>
@@ -117,18 +133,22 @@ export default function LoginScreen({ navigation }) {
             </View>
 
             <TouchableOpacity
-              style={styles.secondaryButton}
+              style={[
+                styles.secondaryButton,
+                isAndroid && styles.androidSecondaryButton
+              ]}
               onPress={() => navigation.navigate('Register')}
+              activeOpacity={isIOS ? 0.7 : 0.85}
             >
-              <Text style={styles.secondaryButtonText}>
-                Crear cuenta nueva
+              <Text style={[styles.secondaryButtonText, isAndroid && styles.androidSecondaryButtonText]}>
+                {isAndroid ? 'CREAR CUENTA NUEVA' : 'Crear cuenta nueva'}
               </Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isIOS && styles.iosInput]}
               placeholder="Correo electrónico"
               placeholderTextColor="#94A3B8"
               value={resetEmail}
@@ -138,20 +158,28 @@ export default function LoginScreen({ navigation }) {
             />
 
             <TouchableOpacity
-              style={[styles.button, loading && styles.buttonDisabled]}
+              style={[
+                styles.button, 
+                loading && styles.buttonDisabled,
+                isAndroid && styles.androidButton
+              ]}
               onPress={handleResetPassword}
               disabled={loading}
+              activeOpacity={isIOS ? 0.7 : 0.85}
             >
               {loading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.buttonText}>Enviar enlace de restablecimiento</Text>
+                <Text style={[styles.buttonText, isAndroid && styles.androidButtonText]}>
+                  {isAndroid ? 'ENVIAR ENLACE' : 'Enviar enlace de restablecimiento'}
+                </Text>
               )}
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShowReset(false)}
               style={styles.linkButton}
+              activeOpacity={isIOS ? 0.7 : 0.85}
             >
               <Text style={styles.linkText}>Volver al inicio de sesión</Text>
             </TouchableOpacity>
@@ -184,16 +212,37 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#2563EB',
   },
+  iosLogoText: {
+    fontWeight: '700',
+    letterSpacing: -0.5,
+  },
   title: {
     fontSize: 24,
     fontWeight: '800',
     color: '#1E293B',
     marginBottom: 8,
   },
+  iosTitle: {
+    fontWeight: '700',
+  },
   subtitle: {
     fontSize: 14,
     color: '#64748B',
     marginBottom: 32,
+  },
+  // Badge de plataforma (requisito a)
+  platformBadge: {
+    backgroundColor: isIOS ? '#E8E8ED' : '#E2E8F0',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 24,
+    alignSelf: 'center',
+  },
+  platformText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: isIOS ? '#3A3A3C' : '#475569',
   },
   input: {
     width: '100%',
@@ -206,13 +255,21 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     marginBottom: 16,
   },
+  iosInput: {
+    borderRadius: 12,
+    paddingVertical: 15,
+  },
   button: {
     width: '100%',
-    backgroundColor: '#2563EB',
-    borderRadius: 16,
-    paddingVertical: 17,
+    backgroundColor: isIOS ? platformColors.ios.primary : platformColors.android.primary,
+    borderRadius: isIOS ? 14 : 16,
+    paddingVertical: isIOS ? 16 : 17,
     alignItems: 'center',
     marginTop: 8,
+  },
+  androidButton: {
+    borderRadius: 25,
+    paddingVertical: 16,
   },
   buttonDisabled: {
     backgroundColor: '#93C5FD',
@@ -222,6 +279,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 17,
   },
+  androidButtonText: {
+    fontWeight: '900',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
   secondaryButton: {
     width: '100%',
     backgroundColor: 'transparent',
@@ -229,19 +291,29 @@ const styles = StyleSheet.create({
     paddingVertical: 17,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#2563EB',
+    borderColor: isIOS ? platformColors.ios.primary : platformColors.android.primary,
+  },
+  androidSecondaryButton: {
+    borderRadius: 25,
+    paddingVertical: 16,
+    borderWidth: 2.5,
   },
   secondaryButtonText: {
-    color: '#2563EB',
+    color: isIOS ? platformColors.ios.primary : platformColors.android.primary,
     fontWeight: '800',
     fontSize: 17,
+  },
+  androidSecondaryButtonText: {
+    fontWeight: '900',
+    fontSize: 16,
+    letterSpacing: 0.5,
   },
   linkButton: {
     marginTop: 16,
     padding: 8,
   },
   linkText: {
-    color: '#2563EB',
+    color: isIOS ? platformColors.ios.primary : platformColors.android.primary,
     fontSize: 14,
     fontWeight: '600',
   },

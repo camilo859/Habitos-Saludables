@@ -1,4 +1,7 @@
-export const habits = [
+// src/utils/dummyData.js
+
+// Datos iniciales para nuevos usuarios (se cargan la primera vez)
+export const initialHabits = [
   {
     id: "1",
     name: "Beber agua",
@@ -10,6 +13,9 @@ export const habits = [
     unit: "vasos",
     icon: "💧",
     color: "#3B82F6",
+    createdAt: "2025-04-01",
+    lastCompleted: "2025-04-07",
+    history: ["2025-04-05", "2025-04-06", "2025-04-07"],
   },
   {
     id: "2",
@@ -22,6 +28,9 @@ export const habits = [
     unit: "minutos",
     icon: "🏋️",
     color: "#10B981",
+    createdAt: "2025-04-01",
+    lastCompleted: "2025-04-07",
+    history: ["2025-04-01", "2025-04-02", "2025-04-03", "2025-04-04", "2025-04-05", "2025-04-06", "2025-04-07"],
   },
   {
     id: "3",
@@ -34,6 +43,9 @@ export const habits = [
     unit: "minutos",
     icon: "📚",
     color: "#8B5CF6",
+    createdAt: "2025-04-01",
+    lastCompleted: "2025-04-07",
+    history: ["2025-04-07"],
   },
   {
     id: "4",
@@ -46,6 +58,9 @@ export const habits = [
     unit: "minutos",
     icon: "🧘",
     color: "#F59E0B",
+    createdAt: "2025-04-01",
+    lastCompleted: "2025-04-07",
+    history: ["2025-04-03", "2025-04-04", "2025-04-05", "2025-04-06", "2025-04-07"],
   },
   {
     id: "5",
@@ -58,6 +73,9 @@ export const habits = [
     unit: "horas",
     icon: "😴",
     color: "#6366F1",
+    createdAt: "2025-04-01",
+    lastCompleted: "2025-04-07",
+    history: ["2025-04-06", "2025-04-07"],
   },
   {
     id: "6",
@@ -70,6 +88,9 @@ export const habits = [
     unit: "porciones",
     icon: "🍎",
     color: "#EF4444",
+    createdAt: "2025-04-01",
+    lastCompleted: "2025-04-07",
+    history: ["2025-03-28", "2025-03-29", "2025-03-30", "2025-03-31", "2025-04-01", "2025-04-02", "2025-04-03", "2025-04-04", "2025-04-05", "2025-04-06", "2025-04-07"],
   },
   {
     id: "7",
@@ -82,6 +103,9 @@ export const habits = [
     unit: "pasos",
     icon: "🚶",
     color: "#14B8A6",
+    createdAt: "2025-04-01",
+    lastCompleted: "2025-04-07",
+    history: ["2025-04-03", "2025-04-04", "2025-04-05", "2025-04-06", "2025-04-07"],
   },
   {
     id: "8",
@@ -94,14 +118,23 @@ export const habits = [
     unit: "día completo",
     icon: "🚫",
     color: "#F97316",
+    createdAt: "2025-04-01",
+    lastCompleted: null,
+    history: [],
   },
 ];
 
+// Categorías disponibles para filtros y creación
 export const categories = ["Todas", "Salud", "Fitness", "Mente", "Nutrición"];
 
+// Perfil de usuario predeterminado
 export const userProfile = {
-  name: "Camilo",
-  username: "@camilo859",
-  joinedDate: "Enero 2025",
-  goal: "Construir 5 hábitos sólidos este semestre",
+  name: "Usuario",
+  username: "@usuario",
+  joinedDate: new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+  goal: "Construir hábitos saludables y mantener consistencia",
+  avatar: "🧑‍💪",
 };
+
+// Exportación por compatibilidad con código existente
+export const habits = initialHabits;

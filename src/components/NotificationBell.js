@@ -11,11 +11,12 @@ import {
 } from "react-native";
 import { generateNotifications, formatRelativeTime } from "../utils/notifications";
 import { habits } from "../utils/dummyData";
+import { isIOS, isAndroid, getAnimationConfig } from "../utils/platformStyles";
 
 /**
  * NotificationBell — ícono de campanita con badge de conteo
  * y modal de lista de notificaciones.
- * Se usa en el header de HomeScreen.
+ * Adaptado para iOS y Android con estilos diferenciados.
  */
 export default function NotificationBell() {
   const { width } = useWindowDimensions();
@@ -44,7 +45,7 @@ export default function NotificationBell() {
         <TouchableOpacity
           style={[styles.notifItem, isRead && styles.notifRead]}
           onPress={() => markOneRead(item.id)}
-          activeOpacity={0.75}
+          activeOpacity={isIOS ? 0.7 : 0.85}
         >
           {/* Dot de no leído */}
           {!isRead && <View style={[styles.unreadDot, { backgroundColor: item.color }]} />}
@@ -76,7 +77,7 @@ export default function NotificationBell() {
       <TouchableOpacity
         style={styles.bellBtn}
         onPress={() => setVisible(true)}
-        activeOpacity={0.75}
+        activeOpacity={isIOS ? 0.7 : 0.85}
       >
         <Text style={styles.bellIcon}>🔔</Text>
         {unreadCount > 0 && (
@@ -167,16 +168,23 @@ const styles = StyleSheet.create({
   },
   panel: {
     position: "absolute",
-    top: 70,
+    top: isIOS ? 70 : 60,
     right: 16,
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+    borderRadius: isIOS ? 20 : 16,
     overflow: "hidden",
     maxHeight: 480,
-    elevation: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
+    ...(isIOS 
+      ? {
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 16,
+        }
+      : {
+          elevation: 12,
+        }
+    ),
   },
   panelHeader: {
     flexDirection: "row",

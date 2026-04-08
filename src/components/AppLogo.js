@@ -1,12 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from "react-native";
+import { isIOS, isAndroid, platformColors, getAnimationConfig } from "../utils/platformStyles";
 
 /**
  * AppLogo — logo de la app Hábitos Saludables.
- * Usa solo React Native primitivos (sin dependencias extra).
- * Props:
- *   size  — "sm" | "md" | "lg"  (default "md")
- *   dark  — bool, fondo oscuro => texto claro (default false)
+ * Adaptado para iOS y Android con estilos diferenciados
  */
 const SIZES = {
   sm: { icon: 28, badge: 36, title: 13, tagline: 9 },
@@ -14,10 +12,28 @@ const SIZES = {
   lg: { icon: 52, badge: 66, title: 22, tagline: 13 },
 };
 
-export default function AppLogo({ size = "md", dark = false }) {
+export default function AppLogo({ size = "md", dark = false, onPress = null }) {
   const s = SIZES[size] || SIZES.md;
-
-  return (
+  
+  // Colores según plataforma y modo oscuro
+  const getBgColor = () => {
+    if (dark) return isIOS ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.25)";
+    return isIOS ? platformColors.ios.primary : platformColors.android.primary;
+  };
+  
+  const getTitleColor = () => {
+    if (dark) return "#FFFFFF";
+    return isIOS ? platformColors.ios.text : platformColors.android.text;
+  };
+  
+  const getTaglineColor = () => {
+    if (dark) return isIOS ? "#C7C7CC" : "#BFDBFE";
+    return isIOS ? platformColors.ios.textSecondary : platformColors.android.textSecondary;
+  };
+  
+  const animationConfig = getAnimationConfig();
+  
+  const LogoContent = () => (
     <View style={styles.wrapper}>
       {/* Icono circular con hoja + corazón */}
       <View
@@ -27,7 +43,8 @@ export default function AppLogo({ size = "md", dark = false }) {
             width: s.badge,
             height: s.badge,
             borderRadius: s.badge / 2,
-            backgroundColor: dark ? "rgba(255,255,255,0.2)" : "#2563EB",
+            backgroundColor: getBgColor(),
+            ...(isIOS ? styles.iosBadge : styles.androidBadge),
           },
         ]}
       >
@@ -39,7 +56,8 @@ export default function AppLogo({ size = "md", dark = false }) {
         <Text
           style={[
             styles.title,
-            { fontSize: s.title, color: dark ? "#FFFFFF" : "#1E293B" },
+            { fontSize: s.title, color: getTitleColor() },
+            isIOS && styles.iosTitle,
           ]}
         >
           HábitosApp
@@ -47,7 +65,7 @@ export default function AppLogo({ size = "md", dark = false }) {
         <Text
           style={[
             styles.tagline,
-            { fontSize: s.tagline, color: dark ? "#BFDBFE" : "#64748B" },
+            { fontSize: s.tagline, color: getTaglineColor() },
           ]}
         >
           Vive mejor, cada día
@@ -55,6 +73,20 @@ export default function AppLogo({ size = "md", dark = false }) {
       </View>
     </View>
   );
+  
+  // Si hay onPress, hacerlo tappable (iOS más sensible)
+  if (onPress) {
+    return (
+      <TouchableOpacity 
+        onPress={onPress} 
+        activeOpacity={isIOS ? 0.7 : 0.85}
+      >
+        <LogoContent />
+      </TouchableOpacity>
+    );
+  }
+  
+  return <LogoContent />;
 }
 
 const styles = StyleSheet.create({
@@ -66,10 +98,15 @@ const styles = StyleSheet.create({
   badge: {
     justifyContent: "center",
     alignItems: "center",
-    elevation: 2,
+  },
+  iosBadge: {
     shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
+  },
+  androidBadge: {
+    elevation: 3,
   },
   textBlock: {
     justifyContent: "center",
@@ -77,6 +114,10 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "800",
     letterSpacing: 0.3,
+  },
+  iosTitle: {
+    fontWeight: "700",
+    letterSpacing: -0.3,
   },
   tagline: {
     marginTop: 1,
