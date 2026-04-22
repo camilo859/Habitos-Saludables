@@ -5,7 +5,6 @@ import { initialHabits, categories as defaultCategories } from '../utils/dummyDa
 
 const HabitsContext = createContext();
 
-// Hook personalizado para usar el contexto
 export const useHabits = () => {
   const context = useContext(HabitsContext);
   if (!context) {
@@ -14,7 +13,6 @@ export const useHabits = () => {
   return context;
 };
 
-// Generar ID único
 const generateId = () => {
   return Date.now().toString() + Math.random().toString(36).substr(2, 9);
 };
@@ -23,16 +21,13 @@ export const HabitsProvider = ({ children }) => {
   const [habits, setHabits] = useState([]);
   const [categories, setCategories] = useState(defaultCategories);
   const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState(null);
 
-  // Cargar hábitos guardados
   useEffect(() => {
     loadHabits();
   }, []);
 
-  // Guardar hábitos automáticamente cuando cambien
   useEffect(() => {
-    if (!loading && habits.length > 0) {
+    if (!loading) {
       saveHabits();
     }
   }, [habits]);
@@ -43,11 +38,10 @@ export const HabitsProvider = ({ children }) => {
       if (stored) {
         setHabits(JSON.parse(stored));
       } else {
-        // Cargar datos iniciales
         setHabits(initialHabits);
       }
     } catch (error) {
-      console.error('Error loading habits:', error);
+      console.error('Error loading:', error);
       setHabits(initialHabits);
     } finally {
       setLoading(false);
@@ -57,14 +51,13 @@ export const HabitsProvider = ({ children }) => {
   const saveHabits = async () => {
     try {
       await AsyncStorage.setItem('@user_habits', JSON.stringify(habits));
-      setLastUpdate(new Date());
     } catch (error) {
-      console.error('Error saving habits:', error);
+      console.error('Error saving:', error);
     }
   };
 
-  // Agregar nuevo hábito
   const addHabit = (habitData) => {
+    const today = new Date().toISOString().split('T')[0];
     const newHabit = {
       id: generateId(),
       name: habitData.name,
@@ -73,18 +66,17 @@ export const HabitsProvider = ({ children }) => {
       streak: 0,
       failures: 0,
       goal: habitData.goal || 1,
-      unit: habitData.unit || 'veces',
+      unit: habitData.unit || 'vez',
       icon: habitData.icon || '📌',
       color: habitData.color || '#2563EB',
-      createdAt: new Date().toISOString(),
+      createdAt: today,
       lastCompleted: null,
-      history: [], // Array de fechas completadas
+      history: [],
     };
     setHabits(prev => [newHabit, ...prev]);
     return newHabit;
   };
 
-  // Editar hábito existente
   const editHabit = (id, updatedData) => {
     setHabits(prev => prev.map(habit => 
       habit.id === id 
@@ -93,23 +85,19 @@ export const HabitsProvider = ({ children }) => {
     ));
   };
 
-  // Eliminar hábito
   const deleteHabit = (id) => {
     setHabits(prev => prev.filter(habit => habit.id !== id));
   };
 
-  // Marcar hábito como completado hoy
   const completeHabit = (id) => {
     const today = new Date().toISOString().split('T')[0];
     
     setHabits(prev => prev.map(habit => {
       if (habit.id !== id) return habit;
       
-      // Verificar si ya completó hoy
       const alreadyCompleted = habit.history?.includes(today);
       if (alreadyCompleted) return habit;
       
-      // Verificar si completó ayer para mantener racha
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayStr = yesterday.toISOString().split('T')[0];
@@ -127,7 +115,6 @@ export const HabitsProvider = ({ children }) => {
     }));
   };
 
-  // Marcar hábito como fallido
   const failHabit = (id) => {
     setHabits(prev => prev.map(habit => 
       habit.id === id 
@@ -136,7 +123,6 @@ export const HabitsProvider = ({ children }) => {
     ));
   };
 
-  // Reiniciar un hábito
   const resetHabit = (id) => {
     setHabits(prev => prev.map(habit => 
       habit.id === id 
@@ -145,41 +131,37 @@ export const HabitsProvider = ({ children }) => {
     ));
   };
 
-  // Agregar nueva categoría
   const addCategory = (categoryName) => {
     if (!categories.includes(categoryName)) {
       setCategories(prev => [...prev, categoryName]);
     }
   };
 
-  // Obtener estadísticas globales
   const getGlobalStats = () => {
     const totalHabits = habits.length;
     const totalStreak = habits.reduce((sum, h) => sum + h.streak, 0);
     const totalFailures = habits.reduce((sum, h) => sum + h.failures, 0);
-    const bestHabit = habits.reduce((best, h) => h.streak > best.streak ? h : best, habits[0]);
-    const completedToday = habits.filter(h => h.history?.includes(new Date().toISOString().split('T')[0])).length;
+    const bestHabit = habits.reduce((best, h) => h.streak > best.streak ? h : best, habits[0] || { streak: 0 });
+    const today = new Date().toISOString().split('T')[0];
+    const completedToday = habits.filter(h => h.history?.includes(today)).length;
     
     return { totalHabits, totalStreak, totalFailures, bestHabit, completedToday };
   };
 
-  const value = {
-    habits,
-    categories,
-    loading,
-    lastUpdate,
-    addHabit,
-    editHabit,
-    deleteHabit,
-    completeHabit,
-    failHabit,
-    resetHabit,
-    addCategory,
-    getGlobalStats,
-  };
-
   return (
-    <HabitsContext.Provider value={value}>
+    <HabitsContext.Provider value={{
+      habits,
+      categories,
+      loading,
+      addHabit,
+      editHabit,
+      deleteHabit,
+      completeHabit,
+      failHabit,
+      resetHabit,
+      addCategory,
+      getGlobalStats,
+    }}>
       {children}
     </HabitsContext.Provider>
   );

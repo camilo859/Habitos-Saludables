@@ -10,6 +10,7 @@ import HomeScreen from '../screens/HomeScreen';
 import HabitDetailScreen from '../screens/HabitDetailScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AddEditHabitScreen from '../screens/AddEditHabitScreen';
+import AIAssistantScreen from '../screens/AIAssistantScreen';
 import { isIOS, platformColors } from '../utils/platformStyles';
 
 const Stack = createNativeStackNavigator();
@@ -35,7 +36,7 @@ export default function StackNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login" screenOptions={screenOptions}>
-        {/* Pantallas de Autenticación */}
+        {/* Pantallas de Autenticación - SIN HEADER */}
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 
@@ -52,11 +53,14 @@ export default function StackNavigator() {
           options={{ headerShown: false }} 
         />
         
-        {/* Pantallas principales de la App */}
+        {/* Pantallas principales de la App - CON HEADER */}
         <Stack.Screen 
           name="Home" 
           component={HomeScreen} 
-          options={{ headerShown: false }} 
+          options={{ 
+            headerShown: true,  // ← CAMBIADO a true para mostrar el header
+            title: '',  // Título vacío para que se vean los botones
+          }} 
         />
         <Stack.Screen 
           name="HabitDetail" 
@@ -72,8 +76,6 @@ export default function StackNavigator() {
             title: isIOS ? 'Mi Perfil' : 'MI PERFIL',
           }} 
         />
-        
-        {/* Pantalla para crear/editar hábitos */}
         <Stack.Screen 
           name="AddEditHabit" 
           component={AddEditHabitScreen} 
@@ -82,6 +84,11 @@ export default function StackNavigator() {
               ? (isIOS ? 'Editar Hábito' : 'EDITAR HÁBITO')
               : (isIOS ? 'Nuevo Hábito' : 'NUEVO HÁBITO'),
           })} 
+        />
+        <Stack.Screen 
+          name="AIAssistant" 
+          component={AIAssistantScreen} 
+          options={{ headerShown: false }} 
         />
       </Stack.Navigator>
     </NavigationContainer>
