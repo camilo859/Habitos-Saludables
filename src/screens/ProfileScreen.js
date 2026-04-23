@@ -6,10 +6,14 @@ import {
   useWindowDimensions,
   ScrollView,
   FlatList,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { habits, userProfile } from "../utils/dummyData";
 import { getLevelColor, getLevelLabel } from "../utils/habitRules";
 import AppLogo from "../components/AppLogo";
+import { logoutUser } from "../services/authService";
+import { isIOS, isAndroid, platformColors, getShadowStyle } from "../utils/platformStyles";
 
 /** Fila de estadística individual — memoizada para FlatList */
 const StatRow = React.memo(({ label, value, color }) => (
@@ -19,7 +23,7 @@ const StatRow = React.memo(({ label, value, color }) => (
   </View>
 ));
 
-export default function ProfileScreen({ route }) {
+export default function ProfileScreen({ route, navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
 
@@ -61,6 +65,24 @@ export default function ProfileScreen({ route }) {
 
   const levelColor = getLevelColor(lastLevel);
   const levelLabel = getLevelLabel(lastLevel);
+
+ const handleLogout = () => {
+  Alert.alert(
+    'Cerrar sesión',
+    '¿Estás seguro de que quieres cerrar sesión?',
+    [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Cerrar sesión',
+        style: 'destructive',
+        onPress: () => {
+          // Navegar directamente al login
+          navigation.replace('Login');
+        }
+      }
+    ]
+  );
+};
 
   return (
     <ScrollView
@@ -124,6 +146,22 @@ export default function ProfileScreen({ route }) {
       <View style={styles.totalCard}>
         <Text style={styles.totalNumber}>{habits.length}</Text>
         <Text style={styles.totalLabel}>hábitos activos registrados</Text>
+      </View>
+
+      {/* Botón de cerrar sesión */}
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity 
+          style={[
+            styles.logoutButton,
+            isAndroid && styles.androidLogoutButton,
+          ]} 
+          onPress={handleLogout}
+          activeOpacity={isIOS ? 0.7 : 0.85}
+        >
+          <Text style={styles.logoutText}>
+            {isIOS ? "🚪 Cerrar sesión" : "🔴 CERRAR SESIÓN"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -212,13 +250,34 @@ const styles = StyleSheet.create({
   statRowLabel: { fontSize: 13, color: "#475569", flex: 1 },
   statRowValue: { fontSize: 14, fontWeight: "700" },
   totalCard: {
-    backgroundColor: "#2563EB",
-    borderRadius: 18,
+    backgroundColor: isIOS ? platformColors.ios.primary : platformColors.android.primary,
+    borderRadius: isIOS ? 20 : 18,
     padding: 22,
     alignItems: "center",
     marginTop: 20,
-    elevation: 4,
+    ...getShadowStyle('medium'),
   },
   totalNumber: { fontSize: 52, fontWeight: "900", color: "#FFFFFF" },
   totalLabel: { fontSize: 14, color: "#BFDBFE", marginTop: 4 },
+  logoutContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  androidLogoutButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 25,
+    minWidth: 200,
+  },
+  logoutText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
 });
