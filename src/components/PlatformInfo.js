@@ -1,76 +1,96 @@
-// src/components/PlatformInfo.js
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { isIOS, isAndroid, platformName, getPlatformColor } from '../utils/platformStyles';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Platform,
+} from 'react-native';
+
+import {
+  isIOS,
+  isAndroid,
+  isWeb,
+  platformName,
+  getPlatformColor,
+} from '../utils/platformStyles';
 
 export default function PlatformInfo() {
   const [showDetails, setShowDetails] = useState(false);
 
   const showPlatformAlert = () => {
-    if (isIOS) {
-      Alert.alert(
-        '📱 Información de Plataforma',
-        'Estás usando la versión iOS de HábitosApp.\n\nCaracterísticas:\n• Diseño minimalista\n• Animaciones fluidas\n• Feedback háptico',
-        [{ text: 'Entendido' }]
-      );
-    } else {
-      Alert.alert(
-        '📱 Información de Plataforma',
-        'Estás usando la versión Android de HábitosApp.\n\nCaracterísticas:\n• Botones optimizados\n• Vibración al tocar\n• Diseño llamativo',
-        [{ text: '¡Genial!' }]
-      );
-    }
+    Alert.alert(
+      'Información de Plataforma',
+      `Sistema actual: ${Platform.OS}`
+    );
   };
 
+  const icon = isIOS ? '🍎' : isAndroid ? '🤖' : '💻';
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       onPress={() => setShowDetails(!showDetails)}
       onLongPress={showPlatformAlert}
-      activeOpacity={isIOS ? 0.7 : 0.85}
+      activeOpacity={0.85}
     >
-      <Text style={styles.platformIcon}>
-        {isIOS ? '🍎' : '🤖'}
-      </Text>
-      <Text style={styles.platformText}>
-        {platformName}
-      </Text>
+      <Text style={styles.platformIcon}>{icon}</Text>
+
+      <View>
+        <Text style={styles.platformText}>
+          Plataforma: {platformName}
+        </Text>
+
+        <Text style={styles.versionText}>
+          UX adaptada automáticamente
+        </Text>
+      </View>
+
       {showDetails && (
         <View style={styles.details}>
           <Text style={styles.detailText}>
-            {isIOS 
-              ? '✨ Experiencia optimizada para iOS' 
-              : '⚡ Rendimiento mejorado para Android'}
+            {isIOS && 'Diseño minimalista estilo iPhone'}
+            {isAndroid && 'Diseño optimizado para Android'}
+            {isWeb && 'Interfaz responsive para navegador'}
           </Text>
         </View>
       )}
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 18,
+    marginTop: 10,
+    gap: 10,
   },
+
   platformIcon: {
-    fontSize: 14,
+    fontSize: 22,
   },
+
   platformText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
+    color: getPlatformColor('primary'),
+  },
+
+  versionText: {
+    fontSize: 11,
     color: '#64748B',
   },
+
   details: {
-    marginLeft: 8,
+    marginLeft: 10,
   },
+
   detailText: {
-    fontSize: 10,
-    color: '#94A3B8',
+    fontSize: 11,
+    color: '#475569',
   },
 });
