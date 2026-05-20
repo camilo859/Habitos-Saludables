@@ -8,7 +8,12 @@ import { Platform } from 'react-native';
 // Detectar plataforma actual
 export const isIOS = Platform.OS === 'ios';
 export const isAndroid = Platform.OS === 'android';
-export const platformName = isIOS ? 'iOS' : 'Android';
+export const isWeb = Platform.OS === 'web';
+
+export const platformName =
+  isIOS ? 'iOS' :
+    isAndroid ? 'Android' :
+      'Web';
 
 // Colores por plataforma
 export const platformColors = {
@@ -33,12 +38,23 @@ export const platformColors = {
     success: '#10B981',
     warning: '#F59E0B',
     danger: '#EF4444',
-  }
+  },
+  web: {
+  primary: '#0F172A',
+  secondary: '#334155',
+  background: '#F8FAFC',
+  card: '#FFFFFF',
+  text: '#111827',
+  textSecondary: '#6B7280',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  danger: '#EF4444',
+}
 };
 
 // Obtener color según plataforma
 export const getPlatformColor = (colorKey) => {
-  const colors = isIOS ? platformColors.ios : platformColors.android;
+  const colors = isIOS ? platformColors.ios : isAndroid ? platformColors.android : platformColors.web;
   return colors[colorKey] || colors.primary;
 };
 
@@ -58,7 +74,7 @@ export const platformShadows = {
 // Función para obtener sombras según plataforma
 export const getShadowStyle = (intensity = 'medium') => {
   const shadows = {
-    light: isIOS 
+    light: isIOS
       ? { shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 }
       : { elevation: 2 },
     medium: isIOS

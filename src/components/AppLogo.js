@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from "react-native";
-import { isIOS, isAndroid, platformColors, getAnimationConfig } from "../utils/platformStyles";
+import { isIOS, isAndroid, isWeb, platformColors, getAnimationConfig } from '../utils/platformStyles';
 
 /**
  * AppLogo — logo de la app Hábitos Saludables.
@@ -14,25 +14,30 @@ const SIZES = {
 
 export default function AppLogo({ size = "md", dark = false, onPress = null }) {
   const s = SIZES[size] || SIZES.md;
-  
+
   // Colores según plataforma y modo oscuro
   const getBgColor = () => {
-    if (dark) return isIOS ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.25)";
-    return isIOS ? platformColors.ios.primary : platformColors.android.primary;
+    if (dark) return 'rgba(255,255,255,0.20)';
+
+    if (isIOS) return platformColors.ios.primary;
+
+    if (isAndroid) return platformColors.android.primary;
+
+    return platformColors.web.primary;
   };
-  
+
   const getTitleColor = () => {
     if (dark) return "#FFFFFF";
     return isIOS ? platformColors.ios.text : platformColors.android.text;
   };
-  
+
   const getTaglineColor = () => {
     if (dark) return isIOS ? "#C7C7CC" : "#BFDBFE";
     return isIOS ? platformColors.ios.textSecondary : platformColors.android.textSecondary;
   };
-  
+
   const animationConfig = getAnimationConfig();
-  
+
   const LogoContent = () => (
     <View style={styles.wrapper}>
       {/* Icono circular con hoja + corazón */}
@@ -43,6 +48,7 @@ export default function AppLogo({ size = "md", dark = false, onPress = null }) {
             width: s.badge,
             height: s.badge,
             borderRadius: s.badge / 2,
+            paddingVertical: 10,
             backgroundColor: getBgColor(),
             ...(isIOS ? styles.iosBadge : styles.androidBadge),
           },
@@ -73,19 +79,19 @@ export default function AppLogo({ size = "md", dark = false, onPress = null }) {
       </View>
     </View>
   );
-  
+
   // Si hay onPress, hacerlo tappable (iOS más sensible)
   if (onPress) {
     return (
-      <TouchableOpacity 
-        onPress={onPress} 
+      <TouchableOpacity
+        onPress={onPress}
         activeOpacity={isIOS ? 0.7 : 0.85}
       >
         <LogoContent />
       </TouchableOpacity>
     );
   }
-  
+
   return <LogoContent />;
 }
 
